@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS ANIMA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+:root{
+  --neon:     #c8a84b;
+  --neon-rgb: 200,168,75;
+  --neon-glow:rgba(200,168,75,.7);
+  --neon-dim: rgba(200,168,75,.18);
+  --white:    #ede8df;
+  --dark:     #05040302;
+}
+html,body{ width:100vw; height:100vh; overflow:hidden; background:#080603; cursor:none; }
+
+/* ══ CURSOR ══ */
+#cur{
+  position:fixed; z-index:9999; pointer-events:none;
+  width:18px; height:18px;
+  border:1px solid rgba(var(--neon-rgb),.65);
+  transform:translate(-50%,-50%) rotate(45deg);
+  transition:border-color .4s;
+}
+#cur::after{
+  content:''; position:absolute; top:50%; left:50%;
+  width:3px; height:3px; background:var(--neon);
+  transform:translate(-50%,-50%) rotate(-45deg);
+  transition:background .4s;
+}
+
+/* ══ BG  for the main menu══ */
+#bg{
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 90% 80% at 75% 55%, rgba(20,14,4,.97) 0%,transparent 65%),
+    radial-gradient(ellipse 70% 90% at 15% 45%, rgba(10,7,2,.96) 0%,transparent 60%),
+    linear-gradient(160deg,#0c0803 0%,#080502 50%,#060401 100%);
+}
+#bg::after{
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,.72) 100%);
+}
+#atm{
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(ellipse 50% 60% at 78% 50%, rgba(var(--neon-rgb),.055) 0%,transparent 55%),
+    radial-gradient(ellipse 30% 35% at 20% 75%, rgba(var(--neon-rgb),.03) 0%,transparent 45%);
+  transition:background .8s ease;
+  animation:atm 18s ease-in-out infinite;
+}
+@keyframes atm{ 0%,100%{opacity:1} 50%{opacity:.55} }
+#grain{
+  position:fixed; inset:-100%; width:300%; height:300%;
+  z-index:2; pointer-events:none; opacity:.038;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation:grain .38s steps(1) infinite;
+}
+@keyframes grain{
+  0%  {transform:translate(0,0)}   25%{transform:translate(-2%,3%)}
+  50% {transform:translate(3%,-2%)} 75%{transform:translate(-1%,-3%)}
+}
+#scan{
+  position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.03;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.5) 3px,rgba(0,0,0,.5) 4px);
+}
+.aline{ position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none; }
+.aline.t{ top:0;    background:linear-gradient(90deg,transparent,rgba(var(--neon-rgb),.3),transparent); transition:background .4s }
+.aline.b{ bottom:0; background:linear-gradient(90deg,transparent,rgba(var(--neon-rgb),.15),transparent); transition:background .4s }
+
+#cin{
+  position:fixed; inset:0; z-index:70;
+  background:#000;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+}
+#cin.gone{ display:none }
+
+.cin-l{
+  width:0; height:1px; background:rgba(200,168,75,.45);
+  animation:cll 4.2s ease forwards .4s;
+}
+@keyframes cll{
+  0%  {width:0;opacity:0}
+  18% {width:320px;opacity:1}
+  78% {width:320px;opacity:1}
+  100%{width:0;opacity:0}
+}
+
+.cin-brand{
+  font-family:'Bebas Neue',sans-serif;
+  font-size: clamp(64px, 10vw, 118px);
+  letter-spacing: 14px;
+  color: rgba(200,168,75,0);
+  text-transform: uppercase;
+  line-height: 1;
+  animation: cin-brand 4.2s ease forwards .4s;
+  /* chromatic split on reveal */
+  position: relative;
+}
+.cin-brand::before,
+.cin-brand::after{
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0; width: 100%;
+  font-family:'Bebas Neue',sans-serif;
+  font-size: inherit; letter-spacing: inherit;
+  animation: cin-chroma 4.2s ease forwards .4s;
+  pointer-events: none;
+}
+.cin-brand::before{
+  color: rgba(0,220,255,.35);
+  clip-path: inset(0 0 55% 0);
+  animation-name: cin-chroma-r;
+}
+.cin-brand::after{
+  color: rgba(255,30,60,.25);
+  clip-path: inset(55% 0 0 0);
+  animation-name: cin-chroma-b;
+}
+@keyframes cin-brand{
+  0%  {color:rgba(200,168,75,0);  letter-spacing:28px; filter:blur(8px)}
+  20% {color:rgba(200,168,75,.9); letter-spacing:14px; filter:blur(0)}
+  75% {color:rgba(200,168,75,.9); letter-spacing:14px; filter:blur(0)}
+  95% {color:rgba(200,168,75,.2); letter-spacing:18px; filter:blur(3px)}
+  100%{color:rgba(200,168,75,0);  letter-spacing:22px; filter:blur(6px)}
+}
+@keyframes cin-chroma-r{
+  0%  {transform:translateX(-12px);opacity:0}
+  20% {transform:translateX(-2px); opacity:1}
+  75% {transform:translateX(-2px); opacity:1}
+  100%{transform:translateX(-6px); opacity:0}
+}
+@keyframes cin-chroma-b{
+  0%  {transform:translateX(12px); opacity:0}
+  20% {transform:translateX(2px);  opacity:1}
+  75% {transform:translateX(2px);  opacity:1}
+  100%{transform:translateX(6px);  opacity:0}
+}
+
+/* small sub-label below the big name */
+.cin-sub{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px; font-weight:300; letter-spacing:10px;
+  color:rgba(200,168,75,0); text-transform:uppercase;
+  animation:cin-sub 4.2s ease forwards .55s;
+}
+@keyframes cin-sub{
+  0%  {color:rgba(200,168,75,0);  letter-spacing:18px}
+  25% {color:rgba(200,168,75,.55); letter-spacing:10px}
+  75% {color:rgba(200,168,75,.55); letter-spacing:10px}
+  100%{color:rgba(200,168,75,0)}
+}
+
+/* ══ UI ══ */
+#ui{ position:fixed; inset:0; z-index:10; opacity:0; pointer-events:none; transition:opacity .6s ease }
+#ui.vis{ opacity:1; pointer-events:auto }
+
+/* ══ CORNERS ══ */
+.cor{
+  position:fixed; width:16px; height:16px;
+  border-color:rgba(var(--neon-rgb),.3); border-style:solid; z-index:11; pointer-events:none;
+  opacity:0; transition:opacity 1.2s ease, border-color .4s;
+}
+.cor.vis{ opacity:1 }
+.cor.tl{ top:22px;    left:22px;    border-width:1px 0 0 1px }
+.cor.tr{ top:22px;    right:22px;   border-width:1px 1px 0 0 }
+.cor.bl{ bottom:22px; left:22px;    border-width:0 0 1px 1px }
+.cor.br{ bottom:22px; right:22px;   border-width:0 1px 1px 0 }
+
+/* ══ HUD ══ */
+#hud{
+  position:fixed; top:0; left:0; right:0; height:52px; z-index:12;
+  display:flex; align-items:center; justify-content:space-between; padding:0 28px;
+  opacity:0; transform:translateY(-8px);
+  transition:opacity .7s ease .2s, transform .7s ease .2s;
+}
+#hud.in{ opacity:1; transform:translateY(0) }
+.hud-l{
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:3.5px;
+  color:rgba(var(--neon-rgb),.35); text-transform:uppercase; transition:color .4s;
+}
+.hud-r{ display:flex; align-items:center; gap:12px }
+.hud-dot{
+  width:5px; height:5px; border-radius:50%;
+  background:var(--neon); box-shadow:0 0 7px var(--neon);
+  animation:hdot 2.4s ease-in-out infinite; transition:background .4s,box-shadow .4s;
+}
+@keyframes hdot{ 0%,100%{opacity:1} 50%{opacity:.2} }
+.hud-stat{
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:2.5px;
+  color:rgba(237,232,223,.2); text-transform:uppercase; transition:opacity .3s;
+}
+
+/* ══ DECO LINE — right side ══ */
+#deco-r{
+  position:fixed; right:42px; top:80px; bottom:80px; z-index:11; pointer-events:none;
+  width:1px;
+  background:linear-gradient(180deg,
+    transparent 0%,
+    rgba(var(--neon-rgb),.12) 20%,
+    rgba(var(--neon-rgb),.22) 50%,
+    rgba(var(--neon-rgb),.12) 80%,
+    transparent 100%);
+  opacity:0; transition:opacity 1s ease 1s, background .4s;
+}
+#deco-r.in{ opacity:1 }
+
+/* ══ TITLE BLOCK — RIGHT SIDE ══ */
+#tblock{
+  position:fixed;
+  right:62px; top:50%; transform:translateY(-50%); z-index:12;
+  text-align:right;
+}
+.eyebrow{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px; font-weight:200; letter-spacing:10px;
+  color:var(--neon); text-transform:uppercase;
+  display:flex; align-items:center; justify-content:flex-end; gap:10px;
+  opacity:0; transform:translateX(14px);
+  transition:opacity .5s ease, transform .5s ease, color .4s;
+  margin-bottom:10px;
+}
+.eyebrow::after{
+  content:''; display:block; width:0; height:1px;
+  background:var(--neon); opacity:.5;
+  transition:width .55s ease .15s, background .4s;
+}
+.eyebrow.in{ opacity:1; transform:translateX(0) }
+.eyebrow.in::after{ width:20px }
+
+.gtitle{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(88px,11.5vw,158px);
+  line-height:.86; letter-spacing:4px; color:var(--white);
+  opacity:0; clip-path:inset(0 0% 0 100%);
+  transition:clip-path 1.1s cubic-bezier(.76,0,.18,1), opacity .05s;
+  text-shadow:
+    -2px 0 0 rgba(var(--neon-rgb),.2),
+    1px 0 0 rgba(0,120,200,.08),
+    0 4px 60px rgba(0,0,0,.8);
+  text-align:right;
+}
+.gtitle.in{ opacity:1; clip-path:inset(0 0% 0 0%) }
+
+.grule{
+  width:0; height:1px; margin:16px 0 16px auto;
+  background:linear-gradient(90deg, rgba(var(--neon-rgb),.05), var(--neon));
+  transition:width 1.2s cubic-bezier(.76,0,.18,1), background .4s;
+}
+.grule.in{ width:min(380px,52vw) }
+
+.gsub{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(10px,1vw,13px); font-weight:200; letter-spacing:12px;
+  color:rgba(237,232,223,.28); text-transform:uppercase;
+  opacity:0; transform:translateY(6px); text-align:right;
+  transition:opacity .6s ease, transform .6s ease;
+}
+.gsub.in{ opacity:1; transform:translateY(0) }
+
+/* ══════════════════════════════════════════════
+   MENU — LEFT SIDE  (WESKER-STYLE)
+   
+   Wesker RE5 traits:
+   - Dark, authoritative. Items sit heavy on the page.
+   - Active item: blood-red/neon slab slides in from left
+   - GLITCH + chromatic aberration burst on select
+   - Items physically jolt sideways on activate
+   - Thick left bar, aggressive overshoot on transition
+   - Inactive items: near-invisible, slightly de-saturated
+   - Active text: CAPS + tight tracking, no decorative underline — pure power
+══════════════════════════════════════════════ */
+#menu{
+  position:fixed; left:58px; top:50%; transform:translateY(-50%); z-index:12;
+  display:flex; flex-direction:column; gap:0;
+}
+
+.mi-wrap{
+  position:relative;
+  opacity:0; transform:translateX(-20px);
+  transition:opacity .4s ease, transform .4s ease;
+  overflow:visible;
+}
+.mi-wrap.in{ opacity:1; transform:translateX(0) }
+
+/* ── the menu button itself ── */
+.mi{
+  position:relative;
+  display:flex; align-items:center;
+  height:54px; padding:0 0 0 26px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px; letter-spacing:6px;
+  text-transform:uppercase;
+  background:none; border:none; cursor:none;
+  text-align:left; min-width:280px;
+  color:rgba(237,232,223,.18);
+  transition:color .18s ease;
+  /* no transform here — we animate the inner text layer */
+}
+
+/* ── SLAB: the thick left bar, RE5 style ── */
+.mi-slab{
+  position:absolute;
+  left:0; top:50%;
+  width:0; height:0;
+  transform:translateY(-50%);
+  /* background + box-shadow driven by JS neon */
+  background:var(--neon);
+  box-shadow: 0 0 22px var(--neon), 0 0 60px rgba(var(--neon-rgb),.25);
+  transition:
+    width .15s cubic-bezier(.9,0,.1,1),
+    height .15s cubic-bezier(.9,0,.1,1),
+    background .4s, box-shadow .4s;
+  border-radius:0;
+}
+.mi.active .mi-slab,
+.mi:hover   .mi-slab{
+  width:5px; height:44px;
+}
+
+/* ── TEXT layer — moves independently for Wesker jolt ── */
+.mi-txt{
+  position:relative;
+  display:inline-block;
+  transition:
+    transform .15s cubic-bezier(.9,0,.1,1),
+    letter-spacing .15s ease,
+    color .18s ease;
+}
+
+/* on hover: slide text in 4px, tighten spacing slightly */
+.mi:hover .mi-txt{
+  transform:translateX(4px);
+  letter-spacing:5px;
+}
+
+/* on active: full power — text jumps, glow blooms */
+.mi.active .mi-txt{
+  transform:translateX(8px);
+  letter-spacing:4px;
+  /* color & text-shadow set by JS */
+}
+
+/* ── SCAN LINE overlay per item (flickers on active) ── */
+.mi-scan{
+  position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 3px,
+    rgba(0,0,0,.18) 3px,rgba(0,0,0,.18) 4px
+  );
+  opacity:0;
+  transition:opacity .18s ease;
+}
+.mi.active .mi-scan{ opacity:1 }
+
+/* ── SIDE ACCENT: small tic mark to the right of active ── */
+.mi-tic{
+  position:absolute; right:-14px; top:50%;
+  transform:translateY(-50%);
+  width:0; height:2px;
+  background:var(--neon);
+  box-shadow:0 0 8px var(--neon);
+  transition:width .18s ease .06s, background .4s, box-shadow .4s;
+}
+.mi.active .mi-tic{ width:10px }
+
+/* ── WESKER GLITCH: chromatic ghost that flashes on selection ── */
+.mi-ghost{
+  position:absolute; inset:0;
+  pointer-events:none; overflow:hidden;
+  display:flex; align-items:center; padding:0 0 0 26px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px; letter-spacing:6px;
+  text-transform:uppercase;
+  opacity:0;
+  /* splits into R/G channels */
+}
+.mi-ghost.r{
+  color:rgba(255,30,60,.55);
+  transform:translateX(-3px);
+  clip-path:inset(0 0 50% 0);
+}
+.mi-ghost.g{
+  color:rgba(0,200,255,.45);
+  transform:translateX(3px);
+  clip-path:inset(50% 0 0 0);
+}
+
+/* glitch burst animation */
+@keyframes wesker-glitch{
+  0%  {opacity:0;transform:translateX(0)}
+  10% {opacity:1;transform:translateX(-4px)}
+  20% {opacity:0;transform:translateX(3px)}
+  30% {opacity:1;transform:translateX(-2px)}
+  50% {opacity:0;transform:translateX(0)}
+  100%{opacity:0}
+}
+.mi-ghost.fire-r{ animation:wesker-glitch .38s ease forwards }
+.mi-ghost.fire-g{ animation:wesker-glitch .38s ease forwards; animation-delay:.03s; }
+
+/* ── BG HIGHLIGHT: faint slab behind the active item ── */
+.mi-bg{
+  position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(var(--neon-rgb),.06) 0%, transparent 70%);
+  opacity:0;
+  transition:opacity .18s ease, background .4s;
+  pointer-events:none;
+}
+.mi.active .mi-bg{ opacity:1 }
+
+/* ══ RIGHT INFO ══ */
+#rinfo{
+  position:fixed; right:62px; top:50%; transform:translateY(-50%);
+  z-index:12;
+  display:flex; flex-direction:column; align-items:flex-end; gap:6px;
+  opacity:0; transition:opacity .8s ease 2.4s;
+}
+#rinfo.in{ opacity:1 }
+.ri-t{
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:2px;
+  color:rgba(237,232,223,.16); text-transform:uppercase;
+}
+.ri-sep{ width:1px; height:28px; margin:3px auto; background:linear-gradient(180deg,transparent,rgba(var(--neon-rgb),.18),transparent); transition:background .4s }
+
+/* press key — left side vertical */
+#pkey{
+  position:fixed; left:24px; top:50%; transform:translateY(-50%);
+  z-index:12;
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px; letter-spacing:3.5px; color:rgba(237,232,223,.18);
+  text-transform:uppercase; writing-mode:vertical-rl; transform:translateY(-50%) rotate(180deg);
+  opacity:0; transition:opacity .5s ease;
+  animation:pk 3s ease-in-out infinite;
+}
+#pkey.in{ opacity:1 }
+@keyframes pk{ 0%,100%{opacity:.12} 50%{opacity:.38} }
+
+/* ══ FLASH / WIPE ══ */
+#flash{ position:fixed; inset:0; z-index:50; pointer-events:none; background:rgba(var(--neon-rgb),0); transition:background .09s ease }
+#flash.f { background:rgba(var(--neon-rgb),.09) }
+#flash.fr{ background:rgba(140,0,0,.14) }
+#wipe{ position:fixed; inset:0; z-index:55; background:#000; transform:scaleX(0); transform-origin:left; pointer-events:none }
+#wipe.go{ animation:wgo .72s cubic-bezier(.77,0,.18,1) forwards }
+@keyframes wgo{
+  0%  {transform:scaleX(0);transform-origin:left}
+  49% {transform:scaleX(1);transform-origin:left}
+  50% {transform:scaleX(1);transform-origin:right}
+  100%{transform:scaleX(0);transform-origin:right}
+}
+
+/* ══ WESKER SELECT JOLT ══
+   When an item is activated via click/enter,
+   the entire menu jolts left then snaps back — biomechanical precision. */
+@keyframes wesker-jolt{
+  0%  {transform:translateY(-50%) translateX(0)}
+  12% {transform:translateY(-50%) translateX(-7px)}
+  28% {transform:translateY(-50%) translateX(5px)}
+  44% {transform:translateY(-50%) translateX(-3px)}
+  60% {transform:translateY(-50%) translateX(2px)}
+  100%{transform:translateY(-50%) translateX(0)}
+}
+#menu.jolt{ animation:wesker-jolt .32s cubic-bezier(.22,.61,.36,1) }
+</style>
+</head>
+<body>
+
+  
+<audio id="game_theme" src="audio/game_theme.mp3" preload="auto" loop></audio>
+<div class="bg-fallback" id="fallback"></div>
+<div class="overlay"></div>
+<audio id="bgm" loop>
+    <source src="audio/game_theme.mp3" type="audio/mpeg">
+    <source src="audio/game_theme.ogg" type="audio/ogg">
+</audio>
+
+
+<div id="cur"></div>
+
+<!-- ══ INTRO ══ -->
+<div id="cin">
+  <div class="cin-l"></div>
+  <div class="cin-brand" data-text="Nexus Studios">Nexus Studios</div>
+  <div class="cin-sub">Battle System Online</div>
+  <div class="cin-l"></div>
+</div>
+
+<audio id="snd" src="madara.mp3" preload="auto"></audio>
+
+<div id="bg"></div>
+<div id="atm"></div>
+<div id="grain"></div>
+<div id="scan"></div>
+<div class="aline t"></div>
+<div class="aline b"></div>
+<div id="flash"></div>
+<div id="wipe"></div>
+
+<div class="cor tl" id="c-tl"></div>
+<div class="cor tr" id="c-tr"></div>
+<div class="cor bl" id="c-bl"></div>
+<div class="cor br" id="c-br"></div>
+<div id="deco-r"></div>
+
+<div id="ui">
+
+  <div id="hud">
+    <div class="hud-l">NEXUS ANIMA &nbsp;·&nbsp; SYSTEM CALIBRATED</div>
+    <div class="hud-r">
+      <div class="hud-dot"></div>
+      <div class="hud-stat" id="hstat">SYSTEM ONLINE</div>
+    </div>
+  </div>
+
+  <div id="tblock">
+    <div class="eyebrow" id="eyebrow">Nexus Studios &nbsp;—&nbsp; presents</div>
+    <div class="gtitle"  id="gtitle">NEXUS<br>ANIMA</div>
+    <div class="grule"   id="grule"></div>
+    <div class="gsub"    id="gsub">Anime Card Battle &nbsp;·&nbsp; Simulate</div>
+  </div>
+
+  <!-- MENU — LEFT (Wesker style) -->
+  <div id="menu">
+
+    <div class="mi-wrap" id="w-0">
+      <button class="mi active" id="mi-0" onclick="act(0)">
+        <div class="mi-bg"></div>
+        <div class="mi-scan"></div>
+        <div class="mi-slab"></div>
+        <span class="mi-txt">Play Game</span>
+        <div class="mi-tic"></div>
+        <div class="mi-ghost r">Play Game</div>
+        <div class="mi-ghost g">Play Game</div>
+      </button>
+    </div>
+
+    <div class="mi-wrap" id="w-1">
+      <button class="mi" id="mi-1" onclick="act(1)">
+        <div class="mi-bg"></div>
+        <div class="mi-scan"></div>
+        <div class="mi-slab"></div>
+        <span class="mi-txt">Replay</span>
+        <div class="mi-tic"></div>
+        <div class="mi-ghost r">Replay</div>
+        <div class="mi-ghost g">Replay</div>
+      </button>
+    </div>
+
+    <div class="mi-wrap" id="w-2">
+      <button class="mi" id="mi-2" onclick="act(2)">
+        <div class="mi-bg"></div>
+        <div class="mi-scan"></div>
+        <div class="mi-slab"></div>
+        <span class="mi-txt">Purchase</span>
+        <div class="mi-tic"></div>
+        <div class="mi-ghost r">Purchase</div>
+        <div class="mi-ghost g">Purchase</div>
+      </button>
+    </div>
+
+    <div class="mi-wrap" id="w-3">
+      <button class="mi" id="mi-3" onclick="act(3)">
+        <div class="mi-bg"></div>
+        <div class="mi-scan"></div>
+        <div class="mi-slab"></div>
+        <span class="mi-txt">Shop</span>
+        <div class="mi-tic"></div>
+        <div class="mi-ghost r">Shop</div>
+        <div class="mi-ghost g">Shop</div>
+      </button>
+    </div>
+
+    <div class="mi-wrap" id="w-4">
+      <button class="mi" id="mi-4" onclick="act(4)">
+        <div class="mi-bg"></div>
+        <div class="mi-scan"></div>
+        <div class="mi-slab"></div>
+        <span class="mi-txt">Options</span>
+        <div class="mi-tic"></div>
+        <div class="mi-ghost r">Options</div>
+        <div class="mi-ghost g">Options</div>
+      </button>
+    </div>
+
+    <div class="mi-wrap" id="w-5">
+      <button class="mi" id="mi-5" onclick="act(5)">
+        <div class="mi-bg"></div>
+        <div class="mi-scan"></div>
+        <div class="mi-slab"></div>
+        <span class="mi-txt">Log out</span>
+        <div class="mi-tic"></div>
+        <div class="mi-ghost r">Log out</div>
+        <div class="mi-ghost g">Log out</div>
+      </button>
+    </div>
+
+  </div><!-- /menu -->
+
+  <div id="rinfo" class="in">
+    <div class="ri-t">Ver 1.0.0</div>
+    <div class="ri-sep"></div>
+    <div class="ri-t">2025</div>
+  </div>
+
+  <div id="pkey">Press Any Key</div>
+
+</div>
+
+<script>
+/* ── cursor ── */
+const cur=document.getElementById('cur');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';
+  cur.style.top =e.clientY+'px';
+});
+
+const ui    = document.getElementById('ui');
+const flash = document.getElementById('flash');
+const wipe  = document.getElementById('wipe');
+const cin   = document.getElementById('cin');
+const snd   = document.getElementById('snd');
+const menuEl= document.getElementById('menu');
+
+/* ══════════════════════════════
+   NEON COLOR CYCLE — 2 s
+══════════════════════════════ */
+const NEONS = [
+  { hex:'#c8a84b', rgb:'200,168,75'  },
+  { hex:'#00f5ff', rgb:'0,245,255'   },
+  { hex:'#ff2244', rgb:'255,34,68'   },
+  { hex:'#bc13fe', rgb:'188,19,254'  },
+  { hex:'#39ff14', rgb:'57,255,20'   },
+  { hex:'#ff8c00', rgb:'255,140,0'   },
+  { hex:'#ffffff', rgb:'255,255,255' },
+];
+let neonIdx = 0;
+
+function applyNeon(n){
+  const root = document.documentElement;
+  root.style.setProperty('--neon',     n.hex);
+  root.style.setProperty('--neon-rgb', n.rgb);
+  root.style.setProperty('--neon-glow',`rgba(${n.rgb},.7)`);
+  root.style.setProperty('--neon-dim', `rgba(${n.rgb},.18)`);
+
+  for(let i=0;i<6;i++){
+    const mi = document.getElementById('mi-'+i);
+    if(!mi) continue;
+    const isActive = mi.classList.contains('active');
+    mi.style.color = isActive ? n.hex : `rgba(${n.rgb},.22)`;
+    if(isActive){
+      mi.querySelector('.mi-txt').style.textShadow = `0 0 32px rgba(${n.rgb},.5), 0 0 8px rgba(${n.rgb},.3)`;
+    } else {
+      mi.querySelector('.mi-txt').style.textShadow = 'none';
+    }
+  }
+}
+
+function cycleNeon(){
+  neonIdx=(neonIdx+1)%NEONS.length;
+  applyNeon(NEONS[neonIdx]);
+}
+applyNeon(NEONS[0]);
+setInterval(cycleNeon,2000);
+
+/* ── audio ── */
+function playMadara(){ snd.currentTime=0; snd.volume=1; snd.play().catch(()=>{}); }
+
+/* ── flash ── */
+function doFlash(t='f'){ flash.classList.add(t); setTimeout(()=>flash.classList.remove(t),130); }
+
+/* ── wipe ── */
+function wipeTo(url){ wipe.classList.add('go'); setTimeout(()=>window.location.href=url,750); }
+
+/* ══ BOOT ══ */
+function boot(){
+  setTimeout(()=>{
+    cin.classList.add('gone');
+    setTimeout(()=>['c-tl','c-tr','c-bl','c-br'].forEach(id=>document.getElementById(id).classList.add('vis')),250);
+    setTimeout(()=>document.getElementById('deco-r').classList.add('in'),300);
+    setTimeout(()=>ui.classList.add('vis'),350);
+    setTimeout(()=>document.getElementById('hud').classList.add('in'),550);
+    setTimeout(()=>document.getElementById('eyebrow').classList.add('in'),900);
+    setTimeout(()=>document.getElementById('gtitle').classList.add('in'),1100);
+    setTimeout(()=>document.getElementById('grule').classList.add('in'),1800);
+    setTimeout(()=>document.getElementById('gsub').classList.add('in'),2050);
+    for(let i=0;i<6;i++)
+      setTimeout(()=>document.getElementById('w-'+i).classList.add('in'), 2300+i*110);
+    setTimeout(()=>document.getElementById('pkey').classList.add('in'),2900);
+    setTimeout(startStatus,3200);
+  }, 4600);
+}
+boot();
+
+const stats=['SYSTEM ONLINE','CARD DATABASE LOADED','SERVERS CONNECTED','BATTLE ENGINE READY','NEXUS SYNC ACTIVE'];
+let si=0;
+function startStatus(){
+  setInterval(()=>{
+    si=(si+1)%stats.length;
+    const el=document.getElementById('hstat');
+    el.style.opacity='0';
+    setTimeout(()=>{ el.textContent=stats[si]; el.style.opacity=''; },320);
+  },4800);
+}
+
+/* ══ WESKER SELECTION ══ */
+const N=6;
+let sel=0;
+const urls=['selection.html','replay.html','purchase.html','shop.html','options.html',null];
+
+/* fire chromatic glitch burst on item i */
+function weskerGlitch(i){
+  const mi = document.getElementById('mi-'+i);
+  const r = mi.querySelector('.mi-ghost.r');
+  const g = mi.querySelector('.mi-ghost.g');
+  /* reset */
+  r.classList.remove('fire-r');
+  g.classList.remove('fire-g');
+  void r.offsetWidth; void g.offsetWidth; /* reflow */
+  r.classList.add('fire-r');
+  g.classList.add('fire-g');
+  /* clean up */
+  setTimeout(()=>{ r.classList.remove('fire-r'); g.classList.remove('fire-g'); }, 420);
+}
+
+/* Wesker menu jolt — whole menu snaps */
+function weskerJolt(){
+  menuEl.classList.remove('jolt');
+  void menuEl.offsetWidth;
+  menuEl.classList.add('jolt');
+  setTimeout(()=>menuEl.classList.remove('jolt'),340);
+}
+
+function setActive(i, doGlitch=false){
+  const prev = document.getElementById('mi-'+sel);
+  prev.classList.remove('active');
+  prev.querySelector('.mi-txt').style.textShadow='none';
+  prev.style.color=`rgba(${NEONS[neonIdx].rgb},.22)`;
+
+  sel=i;
+  const cur2 = document.getElementById('mi-'+sel);
+  cur2.classList.add('active');
+  cur2.style.color = NEONS[neonIdx].hex;
+  cur2.querySelector('.mi-txt').style.textShadow=`0 0 32px rgba(${NEONS[neonIdx].rgb},.5), 0 0 8px rgba(${NEONS[neonIdx].rgb},.3)`;
+
+  if(doGlitch){
+    weskerGlitch(i);
+    weskerJolt();
+  }
+}
+
+function act(i){
+  setActive(i, true);
+  if(i===5){ doFlash('fr'); handleQuit(); return; }
+  if(i===0){ playMadara(); }
+  doFlash('f');
+  setTimeout(()=>wipeTo(urls[i]),200);
+}
+
+function handleQuit(){
+  if(window.opener) window.close();
+  else window.open('','_self').close();
+  setTimeout(()=>window.location.href='about:blank',120);
+}
+
+/* hover: light glitch, no jolt */
+for(let i=0;i<N;i++){
+  document.getElementById('mi-'+i).addEventListener('mouseenter',()=>{
+    if(sel !== i){ setActive(i, true); doFlash('f'); }
+  });
+}
+
+/* keyboard */
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='s'){
+    doFlash('f'); setActive((sel+1)%N, true);
+  } else if(e.key==='ArrowUp'||e.key==='w'){
+    doFlash('f'); setActive((sel-1+N)%N, true);
+  } else if(e.key==='Enter'){
+    act(sel);
+  }
+});
+</script>
+</body>
+</html>
