@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS ANIMA | SPECTRUM_SYNC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@200;300&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ══ NEXUS DESIGN SYSTEM ══ */
+    :root {
+      --neon:      #c8a84b;
+      --neon-rgb:  200,168,75;
+      --neon-glow: rgba(200,168,75,.7);
+      --neon-dim:  rgba(200,168,75,.18);
+      --white:     #ede8df;
+      --dark:      #080603;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; min-height:100vh; background:var(--dark); color:var(--white); font-family:'Share Tech Mono',monospace; cursor:none; overflow:hidden; }
+
+    /* ── CURSOR ── */
+    #cur { position:fixed; z-index:9999; pointer-events:none; width:18px; height:18px; border:1px solid rgba(var(--neon-rgb),.65); transform:translate(-50%,-50%) rotate(45deg); transition:border-color .4s; }
+    #cur::after { content:''; position:absolute; top:50%; left:50%; width:3px; height:3px; background:var(--neon); transform:translate(-50%,-50%) rotate(-45deg); }
+
+    /* ── BACKGROUND ── */
+    #bg { position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse 90% 80% at 75% 55%, rgba(20,14,4,.97) 0%,transparent 65%), radial-gradient(ellipse 70% 90% at 15% 45%, rgba(10,7,2,.96) 0%,transparent 60%), linear-gradient(160deg,#0c0803 0%,#080502 50%,#060401 100%); }
+    #atm { position:fixed; inset:0; z-index:1; pointer-events:none; background: radial-gradient(ellipse 50% 60% at 78% 50%, rgba(var(--neon-rgb),.055) 0%,transparent 55%), radial-gradient(ellipse 30% 35% at 20% 75%, rgba(var(--neon-rgb),.03) 0%,transparent 45%); animation:atm 18s ease-in-out infinite; }
+    @keyframes atm { 0%,100%{opacity:1} 50%{opacity:.55} }
+    #grain { position:fixed; inset:-100%; width:300%; height:300%; z-index:2; pointer-events:none; opacity:.038; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); animation:grain .38s steps(1) infinite; }
+    @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-2%,3%)} 50%{transform:translate(3%,-2%)} 75%{transform:translate(-1%,-3%)} }
+    #scan { position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.03; background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.5) 3px,rgba(0,0,0,.5) 4px); }
+    .aline { position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none; }
+    .aline.t { top:0;    background:linear-gradient(90deg,transparent,rgba(var(--neon-rgb),.3),transparent); }
+    .aline.b { bottom:0; background:linear-gradient(90deg,transparent,rgba(var(--neon-rgb),.15),transparent); }
+
+    /* ── CORNER BRACKETS ── */
+    .cor { position:fixed; width:16px; height:16px; border-color:rgba(var(--neon-rgb),.3); border-style:solid; z-index:11; pointer-events:none; }
+    .cor.tl { top:22px; left:22px; border-width:1px 0 0 1px; }
+    .cor.tr { top:22px; right:22px; border-width:1px 1px 0 0; }
+    .cor.bl { bottom:22px; left:22px; border-width:0 0 1px 1px; }
+    .cor.br { bottom:22px; right:22px; border-width:0 1px 1px 0; }
+
+    /* ── TOP HUD ── */
+    #hud { position:fixed; top:0; left:0; right:0; height:52px; z-index:12; display:flex; align-items:center; justify-content:space-between; padding:0 28px; }
+    .hud-l { font-size:8px; letter-spacing:3.5px; color:rgba(var(--neon-rgb),.35); text-transform:uppercase; }
+    .hud-r { display:flex; align-items:center; gap:12px; }
+    .hud-dot { width:5px; height:5px; border-radius:50%; background:var(--neon); box-shadow:0 0 7px var(--neon); animation:hdot 2.4s ease-in-out infinite; }
+    @keyframes hdot { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── PAGE ── */
+    #page {
+      position:relative; z-index:10;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height:100vh; padding:80px 28px 60px;
+      gap:32px;
+    }
+
+    /* ── TITLE ── */
+    .page-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:200; letter-spacing:10px; color:var(--neon); text-transform:uppercase; opacity:.7; }
+    .page-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,8vw,80px); letter-spacing:8px; color:var(--white); text-shadow:-2px 0 0 rgba(var(--neon-rgb),.2), 1px 0 0 rgba(0,120,200,.08); }
+    .grule { width:min(340px,80vw); height:1px; background:linear-gradient(90deg,rgba(var(--neon-rgb),.05),var(--neon),rgba(var(--neon-rgb),.05)); }
+
+    /* ── GEM COUNTER ── */
+    .gem-counter {
+      display:flex; align-items:center; gap:14px;
+      border:1px solid rgba(var(--neon-rgb),.3); padding:10px 28px;
+      background:rgba(var(--neon-rgb),.04);
+      animation:pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 6px rgba(var(--neon-rgb),.15)} 50%{box-shadow:0 0 22px rgba(var(--neon-rgb),.35)} }
+    .gem-label { font-size:9px; letter-spacing:4px; color:rgba(var(--neon-rgb),.45); text-transform:uppercase; }
+    .gem-value { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; color:var(--neon); text-shadow:0 0 18px var(--neon-glow); }
+
+    /* ── BUNDLE GRID ── */
+    .bundle-container { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+
+    /* ── BUNDLE CARD (Wesker-style panel) ── */
+    .bundle {
+      position:relative;
+      background:rgba(12,9,5,.85);
+      border:1px solid rgba(var(--neon-rgb),.18);
+      width:190px; padding:36px 22px 28px;
+      text-align:center; cursor:none;
+      transition:border-color .2s, transform .2s, box-shadow .2s;
+      overflow:hidden;
+    }
+    /* top accent bar */
+    .bundle::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,var(--neon),transparent); opacity:.4;
+    }
+    /* corner brackets on hover */
+    .bundle::after {
+      content:''; position:absolute; top:-2px; left:-2px;
+      width:10px; height:10px;
+      border:2px solid var(--neon); border-right:none; border-bottom:none;
+      opacity:0; transition:opacity .2s;
+    }
+    .bundle:hover { border-color:var(--neon); transform:translateY(-6px); box-shadow:0 18px 50px rgba(var(--neon-rgb),.18); }
+    .bundle:hover::after { opacity:1; }
+
+    /* scan line per card */
+    .bundle-scan {
+      position:absolute; inset:0; pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.18) 3px,rgba(0,0,0,.18) 4px);
+      opacity:0; transition:opacity .18s;
+    }
+    .bundle:hover .bundle-scan { opacity:1; }
+
+    .bundle-tier { font-size:8px; letter-spacing:3px; color:rgba(var(--neon-rgb),.35); margin-bottom:14px; }
+    .bundle-amount { font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:2px; color:var(--white); line-height:1; margin-bottom:4px; }
+    .bundle-unit { font-size:9px; letter-spacing:4px; color:rgba(var(--neon-rgb),.5); margin-bottom:20px; }
+    .bundle-price { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; color:var(--neon); text-shadow:0 0 12px var(--neon-glow); margin-bottom:22px; }
+
+    /* buy button — Wesker slab style */
+    .buy-btn {
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      background:none; border:1px solid rgba(var(--neon-rgb),.25);
+      color:rgba(var(--neon-rgb),.45);
+      font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:3px;
+      padding:10px 16px; width:100%; cursor:none;
+      text-transform:uppercase; transition:all .18s ease;
+    }
+    .buy-btn-slab { width:0; height:0; background:var(--neon); transition:width .15s cubic-bezier(.9,0,.1,1), height .15s cubic-bezier(.9,0,.1,1); flex-shrink:0; }
+    .bundle:hover .buy-btn { border-color:var(--neon); color:var(--neon); }
+    .bundle:hover .buy-btn-slab { width:4px; height:16px; }
+
+    /* ── BACK BUTTON ── */
+    .nx-btn {
+      position:relative; display:inline-flex; align-items:center; gap:12px;
+      background:none; border:none; cursor:none; text-decoration:none;
+      font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:5px;
+      color:rgba(var(--neon-rgb),.3); text-transform:uppercase; padding:10px 0;
+      transition:color .18s ease;
+    }
+    .nx-btn .btn-slab { width:0; height:0; background:var(--neon); box-shadow:0 0 22px var(--neon); transition:width .15s cubic-bezier(.9,0,.1,1), height .15s cubic-bezier(.9,0,.1,1); flex-shrink:0; }
+    .nx-btn:hover { color:var(--neon); }
+    .nx-btn:hover .btn-slab { width:4px; height:22px; }
+
+    /* ── CLOCK ── */
+    #clock-display { font-size:8px; letter-spacing:2px; color:rgba(var(--neon-rgb),.35); }
+
+    /* ── LOAD BAR ── */
+    .load-wrap { position:fixed; bottom:0; left:0; right:0; height:1px; background:rgba(var(--neon-rgb),.08); z-index:20; }
+    .load-bar { height:100%; width:0%; background:var(--neon); box-shadow:0 0 8px var(--neon); animation:load 4s linear infinite; }
+    @keyframes load { 0%{width:0%;margin-left:0} 50%{width:100%;margin-left:0} 100%{width:0%;margin-left:100%} }
+
+    /* ── FLASH ── */
+    #flash { position:fixed; inset:0; z-index:50; pointer-events:none; background:rgba(var(--neon-rgb),0); transition:background .09s ease; }
+    #flash.f { background:rgba(var(--neon-rgb),.12); }
+  </style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="bg"></div>
+<div id="atm"></div>
+<div id="grain"></div>
+<div id="scan"></div>
+<div class="aline t"></div>
+<div class="aline b"></div>
+<div id="flash"></div>
+<div class="load-wrap"><div class="load-bar"></div></div>
+
+<div class="cor tl"></div>
+<div class="cor tr"></div>
+<div class="cor bl"></div>
+<div class="cor br"></div>
+
+<!-- ── HUD ── -->
+<div id="hud">
+  <div class="hud-l">NEXUS ANIMA &nbsp;·&nbsp; SPECTRUM SYNC</div>
+  <div class="hud-r">
+    <div class="hud-dot"></div>
+    <span id="clock-display">00:00:00</span>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<div id="page">
+
+  <div style="text-align:center;">
+    <div class="page-eyebrow">Gem Acquisition Protocol</div>
+    <div class="page-title">PURCHASE</div>
+  </div>
+  <div class="grule"></div>
+
+  <div class="gem-counter">
+    <span class="gem-label">Gems Synced</span>
+    <span class="gem-value" id="current-gems">0</span>
+  </div>
+
+  <div class="bundle-container">
+
+    <div class="bundle" onclick="addGems(60)">
+      <div class="bundle-scan"></div>
+      <div class="bundle-tier">DATA_PK_S</div>
+      <div class="bundle-amount">60</div>
+      <div class="bundle-unit">GEMS</div>
+      <div class="bundle-price">₹99.00</div>
+      <button class="buy-btn">
+        <div class="buy-btn-slab"></div>
+        <span>Acquire</span>
+      </button>
+    </div>
+
+    <div class="bundle" onclick="addGems(300)">
+      <div class="bundle-scan"></div>
+      <div class="bundle-tier">DATA_PK_M</div>
+      <div class="bundle-amount">300</div>
+      <div class="bundle-unit">GEMS</div>
+      <div class="bundle-price">₹499.00</div>
+      <button class="buy-btn">
+        <div class="buy-btn-slab"></div>
+        <span>Acquire</span>
+      </button>
+    </div>
+
+    <div class="bundle" onclick="addGems(980)">
+      <div class="bundle-scan"></div>
+      <div class="bundle-tier">DATA_PK_L</div>
+      <div class="bundle-amount">980</div>
+      <div class="bundle-unit">GEMS</div>
+      <div class="bundle-price">₹1,499.00</div>
+      <button class="buy-btn">
+        <div class="buy-btn-slab"></div>
+        <span>Acquire</span>
+      </button>
+    </div>
+
+    <div class="bundle" onclick="addGems(1980)">
+      <div class="bundle-scan"></div>
+      <div class="bundle-tier">DATA_PK_XL &nbsp;◆&nbsp; FOR 1</div>
+      <div class="bundle-amount">1980</div>
+      <div class="bundle-unit">GEMS</div>
+      <div class="bundle-price">₹2,999.00</div>
+      <button class="buy-btn">
+        <div class="buy-btn-slab"></div>
+        <span>Acquire</span>
+      </button>
+    </div>  
+
+    <div class="bundle" onclick="addGems(3280)">
+      <div class="bundle-scan"></div>
+      <div class="bundle-tier">DATA_PK_XXL</div>
+      <div class="bundle-amount">3280</div>
+      <div class="bundle-unit">GEMS</div>
+      <div class="bundle-price">₹4,999.00</div>
+      <button class="buy-btn">
+        <div class="buy-btn-slab"></div>
+        <span>Acquire</span>
+      </button>
+    </div>
+
+    <div class="bundle" onclick="addGems(6480)">
+      <div class="bundle-scan"></div>
+      <div class="bundle-tier">DATA_PK_XXXL &nbsp;◆&nbsp; BEST VALUE</div>
+      <div class="bundle-amount">6480</div>
+      <div class="bundle-unit">GEMS</div>
+      <div class="bundle-price">₹9,900.00</div>
+      <button class="buy-btn">
+        <div class="buy-btn-slab"></div>
+        <span>Acquire</span>
+      </button>
+    </div>
+
+  </div>
+
+  <a class="nx-btn" href="game.html">
+    <div class="btn-slab"></div>
+    <span>← Main Menu</span>
+  </a>
+
+</div>
+
+<script>
+  /* ── Cursor ── */
+  const cur = document.getElementById('cur');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  });
+
+  /* ── Neon Cycle ── */
+  const NEONS = [
+    { hex:'#c8a84b', rgb:'200,168,75' },
+    { hex:'#00f5ff', rgb:'0,245,255'  },
+    { hex:'#ff2244', rgb:'255,34,68'  },
+    { hex:'#bc13fe', rgb:'188,19,254' },
+    { hex:'#39ff14', rgb:'57,255,20'  },
+    { hex:'#ff8c00', rgb:'255,140,0'  },
+    { hex:'#ffffff', rgb:'255,255,255'},
+  ];
+  let neonIdx = 0;
+  function applyNeon(n) {
+    const r = document.documentElement;
+    r.style.setProperty('--neon',      n.hex);
+    r.style.setProperty('--neon-rgb',  n.rgb);
+    r.style.setProperty('--neon-glow', `rgba(${n.rgb},.7)`);
+    r.style.setProperty('--neon-dim',  `rgba(${n.rgb},.18)`);
+  }
+  applyNeon(NEONS[0]);
+  setInterval(() => { neonIdx = (neonIdx+1) % NEONS.length; applyNeon(NEONS[neonIdx]); }, 2000);
+
+  /* ── Clock ── */
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock-display').innerText =
+      now.getHours().toString().padStart(2,'0') + ':' +
+      now.getMinutes().toString().padStart(2,'0') + ':' +
+      now.getSeconds().toString().padStart(2,'0');
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  /* ── Flash ── */
+  const flash = document.getElementById('flash');
+  function doFlash() { flash.classList.add('f'); setTimeout(() => flash.classList.remove('f'), 130); }
+
+  /* ── Gem logic (untouched) ── */
+  function addGems(amount) {
+    let current = parseInt(localStorage.getItem('userGems')) || 0;
+    localStorage.setItem('userGems', current + amount);
+    document.getElementById('current-gems').innerText = (current + amount);
+    doFlash();
+  }
+
+  document.getElementById('current-gems').innerText = localStorage.getItem('userGems') || 0;
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS ANIMA — Choose Your Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --bg:#06070f; --bg2:#0b0d1a; --bg3:#111428;
+    --gold:#f5c542; --red:#ff3c5a; --blue:#38b6ff;
+    --green:#3fffa2; --purple:#b060ff;
+    --txt:#e0e6ff; --txt2:#8090b0; --border:#2a2f5050;
+}
+html,body { width:100%; min-height:100vh; background:var(--bg); color:var(--txt); font-family:'Rajdhani',sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow-x:hidden; }
+
+/* ── animated bg ── */
+.bg-scene { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bg-orb { position:absolute; border-radius:50%; filter:blur(80px); animation:orbDrift 18s ease-in-out infinite alternate; }
+.bg-orb:nth-child(1){ width:500px;height:500px;background:#b060ff12;top:-100px;left:-100px;animation-duration:20s; }
+.bg-orb:nth-child(2){ width:400px;height:400px;background:#38b6ff10;top:40%;right:-120px;animation-duration:25s;animation-delay:-8s; }
+.bg-orb:nth-child(3){ width:350px;height:350px;background:#f5c54208;bottom:-80px;left:30%;animation-duration:22s;animation-delay:-12s; }
+@keyframes orbDrift { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(40px,30px) scale(1.1)} }
+
+/* grid lines */
+.bg-grid {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image: linear-gradient(#ffffff04 1px, transparent 1px), linear-gradient(90deg, #ffffff04 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
+}
+
+/* particles */
+.particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.particle { position:absolute; border-radius:50%; animation:drift linear infinite; opacity:0; }
+@keyframes drift { 0%{opacity:0;transform:translateY(100vh) scale(0)} 10%{opacity:.6} 90%{opacity:.3} 100%{opacity:0;transform:translateY(-10vh) scale(1.2)} }
+
+.page {
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; align-items:center; gap:44px;
+    padding:48px 20px; max-width:840px; width:100%;
+    animation:pageIn .8s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes pageIn { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── logo ── */
+.logo-wrap { text-align:center; }
+.logo-eyebrow { font-size:.75rem; font-weight:700; letter-spacing:6px; color:var(--txt2); text-transform:uppercase; margin-bottom:12px; }
+.logo-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(2.2rem,8vw,4.6rem);
+    background:linear-gradient(135deg,#f5c542 0%,#ffd700 40%,#ff8c00 80%,#f5c542 100%);
+    background-size:200%;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    letter-spacing:4px; line-height:1.1;
+    animation:shimmer 4s linear infinite, titleIn .9s cubic-bezier(.2,.8,.3,1) both;
+    filter:drop-shadow(0 0 30px #f5c54240);
+}
+@keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+@keyframes titleIn { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+.logo-subtitle { font-size:1rem; color:var(--txt2); margin-top:10px; letter-spacing:1px; }
+
+/* ── divider ── */
+.divider { display:flex; align-items:center; gap:14px; width:280px; }
+.div-line { flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold)); opacity:.35; }
+.div-line:last-child { background:linear-gradient(90deg,var(--gold),transparent); }
+.div-icon { color:var(--gold); font-size:.9rem; opacity:.6; }
+
+/* ── mode cards ── */
+.modes { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:22px; width:100%; }
+
+.mode-card {
+    background:linear-gradient(150deg,#0f1530 0%,#080c1a 100%);
+    border:1px solid var(--border);
+    border-radius:20px; padding:32px 26px;
+    cursor:pointer; text-decoration:none;
+    display:flex; flex-direction:column; gap:14px;
+    position:relative; overflow:hidden;
+    transition:transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s, border-color .3s;
+    animation:cardIn .7s cubic-bezier(.2,.8,.3,1) both;
+}
+.mode-card:nth-child(1){ animation-delay:.1s }
+.mode-card:nth-child(2){ animation-delay:.2s }
+@keyframes cardIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+/* top accent bar */
+.mode-card::after {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent,var(--gold)),transparent);
+    opacity:.7;
+}
+/* inner glow */
+.mode-card::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% -20%,var(--glow,#f5c54210) 0%,transparent 55%);
+    pointer-events:none;
+}
+
+.mode-card:hover {
+    transform:translateY(-8px) scale(1.01);
+    border-color:var(--accent,var(--gold));
+    box-shadow:0 20px 60px var(--shadow,#f5c54225), 0 0 0 1px var(--accent,var(--gold))20;
+}
+
+/* card variants */
+.mode-card.tutorial  { --accent:var(--blue); --glow:#38b6ff12; --shadow:#38b6ff30; }
+.mode-card.waves     { --accent:var(--purple); --glow:#b060ff12; --shadow:#b060ff30; }
+
+.mode-icon-wrap { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:2rem; background:color-mix(in srgb,var(--accent,var(--gold)) 12%,transparent); border:1px solid color-mix(in srgb,var(--accent,var(--gold)) 25%,transparent); transition:transform .3s; }
+.mode-card:hover .mode-icon-wrap { transform:scale(1.1) rotate(-5deg); }
+
+.mode-badge { display:inline-block; font-size:.65rem; font-weight:700; letter-spacing:2px; padding:3px 10px; border-radius:10px; text-transform:uppercase; background:color-mix(in srgb,var(--accent,var(--gold)) 12%,transparent); color:var(--accent,var(--gold)); border:1px solid color-mix(in srgb,var(--accent,var(--gold)) 25%,transparent); width:fit-content; }
+.mode-title { font-family:'Exo 2',sans-serif; font-size:1.5rem; font-weight:900; color:var(--txt); letter-spacing:1px; }
+.mode-desc { font-size:.88rem; color:var(--txt2); line-height:1.65; }
+
+.mode-features { display:flex; flex-direction:column; gap:7px; margin-top:4px; }
+.mf { font-size:.78rem; color:var(--txt2); display:flex; align-items:center; gap:8px; }
+.mf-dot { width:5px;height:5px;border-radius:50%;background:var(--accent,var(--gold));flex-shrink:0;box-shadow:0 0 6px var(--accent,var(--gold)); }
+
+.mode-cta { margin-top:auto; font-family:'Exo 2',sans-serif; font-size:.85rem; font-weight:700; color:var(--accent,var(--gold)); letter-spacing:1px; text-transform:uppercase; display:flex; align-items:center; gap:6px; opacity:.7; transition:opacity .2s, gap .2s; }
+.mode-cta-arrow { transition:transform .2s; }
+.mode-card:hover .mode-cta { opacity:1; gap:10px; }
+.mode-card:hover .mode-cta-arrow { transform:translateX(4px); }
+
+/* ── music bar ── */
+.music-bar {
+    display:flex; align-items:center; gap:12px;
+    background:#0f1530; border:1px solid var(--border);
+    border-radius:30px; padding:10px 20px;
+    font-size:.78rem; color:var(--txt2);
+}
+.music-btn { background:none; border:1px solid var(--border); border-radius:50%; width:32px;height:32px; color:var(--txt2); font-size:.9rem; transition:all .2s; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.music-btn:hover { border-color:var(--gold); color:var(--gold); }
+.music-bars { display:flex; align-items:flex-end; gap:2px; height:14px; }
+.mb { width:3px; border-radius:2px; background:var(--gold); animation:mb 1s ease-in-out infinite alternate; }
+.mb:nth-child(1){height:6px;animation-delay:0s}.mb:nth-child(2){height:12px;animation-delay:.15s}.mb:nth-child(3){height:8px;animation-delay:.3s}.mb:nth-child(4){height:14px;animation-delay:.1s}.mb:nth-child(5){height:5px;animation-delay:.25s}
+@keyframes mb { 0%{transform:scaleY(1)} 100%{transform:scaleY(.3)} }
+.music-bars.paused .mb { animation-play-state:paused; }
+
+.footer { font-size:.72rem; color:#2a3050; text-align:center; }
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-scene">
+    <div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div>
+</div>
+<div class="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<div class="page">
+    <div class="logo-wrap">
+        <div class="logo-eyebrow">⚔ Enter the Arena ⚔</div>
+        <div class="logo-title">NEXUS ANIMA</div>
+        <div class="logo-subtitle">Build your party. Conquer the waves.</div>
+    </div>
+
+    <div class="divider">
+        <div class="div-line"></div>
+        <span class="div-icon">✦</span>
+        <div class="div-line"></div>
+    </div>
+
+    <div class="modes">
+        <a class="mode-card tutorial" href="tutorial.html">
+            <div class="mode-icon-wrap">📖</div>
+            <div class="mode-badge">Learn the Basics</div>
+            <div class="mode-title">Tutorial Mode</div>
+            <div class="mode-desc">New to Nexus Anima? A guided battle walks you through every mechanic step by step.</div>
+            <div class="mode-features">
+                <div class="mf"><div class="mf-dot"></div>Step-by-step guided combat</div>
+                <div class="mf"><div class="mf-dot"></div>Learn SP, Skills & Passives</div>
+                <div class="mf"><div class="mf-dot"></div>Action Value turn system</div>
+                <div class="mf"><div class="mf-dot"></div>Pre-set party — no decisions needed</div>
+            </div>
+            <div class="mode-cta">Start Tutorial <span class="mode-cta-arrow">→</span></div>
+        </a>
+
+        <a class="mode-card waves" href="wavesmod.html">
+            <div class="mode-icon-wrap">🌊</div>
+            <div class="mode-badge">Endless Challenge</div>
+            <div class="mode-title">Wave Mode</div>
+            <div class="mode-desc">Build your party and fight endless waves of increasingly powerful anime villains.</div>
+            <div class="mode-features">
+                <div class="mf"><div class="mf-dot"></div>Pick your own 4-hero party</div>
+                <div class="mf"><div class="mf-dot"></div>Waves scale infinitely in difficulty</div>
+                <div class="mf"><div class="mf-dot"></div>Boss waves every 5 rounds</div>
+                <div class="mf"><div class="mf-dot"></div>AI-powered enemy taunts</div>
+            </div>
+            <div class="mode-cta">Fight Waves <span class="mode-cta-arrow">→</span></div>
+        </a>
+    </div>
+
+    <!-- Music controls -->
+    <div class="music-bar">
+        <div class="music-bars" id="mbars">
+            <div class="mb"></div><div class="mb"></div><div class="mb"></div><div class="mb"></div><div class="mb"></div>
+        </div>
+        <span id="music-label">Menu Music</span>
+        <button class="music-btn" id="music-toggle" onclick="toggleMusic()" title="Toggle Music">♪</button>
+        <button class="music-btn" onclick="adjustVol(-0.1)" title="Volume down">−</button>
+        <button class="music-btn" onclick="adjustVol(0.1)" title="Volume up">+</button>
+    </div>
+
+    <div class="footer">Nexus Anima · All characters are from their respective series</div>
+</div>
+
+<!-- Audio -->
+<audio id="bgm" loop>
+    <!-- Replace src with your menu music file path -->
+    <source src="audio/menu_theme.mp3" type="audio/mpeg">
+    <source src="audio/menu_theme.ogg" type="audio/ogg">
+</audio>
+
+<script>
+// ── Particles ──
+const container = document.getElementById('particles');
+const colors = ['#f5c542','#38b6ff','#b060ff','#3fffa2','#ff3c5a'];
+for(let i=0;i<35;i++){
+    const p=document.createElement('div'); p.className='particle';
+    const size=Math.random()*3+1;
+    p.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*15+10}s;animation-delay:${Math.random()*15}s;box-shadow:0 0 ${size*2}px currentColor;`;
+    container.appendChild(p);
+}
+
+const bgm = document.getElementById('bgm');
+let musicPlaying = false;
+let volume = 0.25;
+bgm.volume = volume;
+
+function tryAutoplay() {
+    bgm.play().then(()=>{ musicPlaying=true; updateMusicUI(); }).catch(()=>{ /* autoplay blocked */ });
+}
+document.addEventListener('click', ()=>{ if(!musicPlaying){ bgm.play().then(()=>{ musicPlaying=true; updateMusicUI(); }).catch(()=>{}); } }, { once:true });
+setTimeout(tryAutoplay, 500);
+
+window.toggleMusic = function() {
+    if(musicPlaying){ bgm.pause(); musicPlaying=false; }
+    else { bgm.play(); musicPlaying=true; }
+    updateMusicUI();
+};
+window.adjustVol = function(delta) {
+    volume = Math.max(0, Math.min(1, volume + delta));
+    bgm.volume = volume;
+};
+function updateMusicUI() {
+    const bars = document.getElementById('mbars');
+    bars.classList.toggle('paused', !musicPlaying);
+    document.getElementById('music-toggle').textContent = musicPlaying ? '❚❚' : '▶';
+}
+
+// Save music preference
+window.addEventListener('beforeunload', ()=>{ localStorage.setItem('al_music_vol', volume); });
+const savedVol = parseFloat(localStorage.getItem('al_music_vol'));
+if(!isNaN(savedVol)){ volume=savedVol; bgm.volume=volume; }
+</script>
+</body>
+</html>

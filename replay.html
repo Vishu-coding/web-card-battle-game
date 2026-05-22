@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REPLAYS - NEXUS ANIMA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+:root{
+  --neon:     #c8a84b;
+  --neon-rgb: 200,168,75;
+  --neon-glow:rgba(200,168,75,.7);
+  --neon-dim: rgba(200,168,75,.18);
+  --white:    #ede8df;
+  --dark:     #05040302;
+}
+html,body{ width:100vw; height:100vh; overflow:hidden; background:#080603; cursor:none; font-family:'Share Tech Mono',monospace; }
+
+/* ══ CURSOR ══ */
+#cur{
+  position:fixed; z-index:9999; pointer-events:none;
+  width:18px; height:18px;
+  border:1px solid rgba(var(--neon-rgb),.65);
+  transform:translate(-50%,-50%) rotate(45deg);
+  transition:border-color .4s;
+}
+#cur::after{
+  content:''; position:absolute; top:50%; left:50%;
+  width:3px; height:3px; background:var(--neon);
+  transform:translate(-50%,-50%) rotate(-45deg);
+  transition:background .4s;
+}
+
+/* ══ BG ══ */
+#bg{
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 90% 80% at 75% 55%, rgba(20,14,4,.97) 0%,transparent 65%),
+    radial-gradient(ellipse 70% 90% at 15% 45%, rgba(10,7,2,.96) 0%,transparent 60%),
+    linear-gradient(160deg,#0c0803 0%,#080502 50%,#060401 100%);
+}
+#grain{
+  position:fixed; inset:-100%; width:300%; height:300%;
+  z-index:2; pointer-events:none; opacity:.038;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation:grain .38s steps(1) infinite;
+}
+@keyframes grain{
+  0%  {transform:translate(0,0)}   25%{transform:translate(-2%,3%)}
+  50% {transform:translate(3%,-2%)} 75%{transform:translate(-1%,-3%)}
+}
+#scan{ position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.03; background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.5) 3px,rgba(0,0,0,.5) 4px); }
+.aline{ position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none; }
+.aline.t{ top:0; background:linear-gradient(90deg,transparent,rgba(var(--neon-rgb),.3),transparent); }
+.aline.b{ bottom:0; background:linear-gradient(90deg,transparent,rgba(var(--neon-rgb),.15),transparent); }
+
+/* ══ HEADER ══ */
+#header{ position:fixed; top:0; left:0; right:0; height:52px; z-index:20; display:flex; align-items:center; justify-content:space-between; padding:0 28px; }
+#title{ font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:6px; color:var(--neon); text-transform:uppercase; }
+.hud-stat{ font-size:8px; letter-spacing:2.5px; color:rgba(237,232,223,.4); }
+#back-btn{ background:none; border:1px solid rgba(var(--neon-rgb),.4); color:var(--neon); font-size:11px; letter-spacing:3px; padding:6px 16px; border-radius:4px; text-transform:uppercase; text-decoration:none; transition:color .3s, border-color .3s, box-shadow .3s; }
+#back-btn:hover{ border-color:var(--neon); box-shadow:0 0 12px var(--neon-glow); }
+
+/* ══ REPLAY LIST ══ */
+#replays{ position:fixed; top:80px; bottom:0; left:0; right:0; padding:40px; overflow-y:auto; display:flex; flex-direction:column; gap:24px; }
+.empty-state{ text-align:center; padding:80px 40px; color:rgba(237,232,223,.3); }
+.empty-state h2{ font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,6vw,48px); letter-spacing:8px; color:var(--neon); margin-bottom:12px; }
+.empty-state p{ font-size:14px; letter-spacing:2px; max-width:480px; margin:0 auto; }
+
+/* ══ REPLAY ITEM ══ */
+.replay{ background:rgba(5,4,3,.6); border:1px solid rgba(var(--neon-rgb),.25); border-radius:16px; padding:28px; display:flex; gap:32px; align-items:flex-start; position:relative; overflow:hidden; transition:transform .3s, border-color .3s, box-shadow .3s; }
+.replay:hover{ transform:translateY(-6px); border-color:var(--neon); box-shadow:0 20px 60px rgba(var(--neon-rgb),.2); }
+.replay::before{ content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--neon); opacity:.3; }
+.replay-meta{ flex:1; }
+.replay-time{ font-size:11px; letter-spacing:3px; color:rgba(237,232,223,.4); text-transform:uppercase; margin-bottom:8px; }
+.replay-boss{ font-family:'Bebas Neue',sans-serif; font-size:clamp(20px,3vw,32px); letter-spacing:4px; color:var(--white); margin-bottom:4px; text-shadow:0 0 16px rgba(var(--neon-rgb),.5); }
+.replay-hp{ font-size:12px; color:var(--neon); font-weight:bold; letter-spacing:1px; }
+.replay-team{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+.team-hero{ width:64px; height:64px; border-radius:12px; border:2px solid rgba(var(--neon-rgb),.4); object-fit:cover; transition:border-color .3s, transform .3s; position:relative; }
+.team-hero::after{ content:attr(data-name); position:absolute; bottom:-24px; left:50%; transform:translateX(-50%); font-size:10px; color:var(--neon); white-space:nowrap; opacity:0; transition:opacity .3s; }
+.team-hero:hover{ border-color:var(--neon); transform:scale(1.1); }
+.team-hero:hover::after{ opacity:1; }
+.replay-del{ background:rgba(140,0,0,.8); border:1px solid rgba(255,50,50,.5); color:#fff; font-size:11px; letter-spacing:2px; padding:8px 16px; border-radius:6px; text-transform:uppercase; cursor:pointer; transition:background .3s; font-family:'Share Tech Mono',monospace; }
+.replay-del:hover{ background:rgba(200,0,0,.9); }
+
+/* ══ NEON CYCLE ══ */
+@keyframes neonPulse{ 0%,100%{ filter:brightness(1) } 50%{ filter:brightness(1.3) } }
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="bg"></div>
+<div id="grain"></div>
+<div id="scan"></div>
+<div class="aline t"></div>
+<div class="aline b"></div>
+
+<div id="header">
+  <div id="title">BATTLE ARCHIVE</div>
+  <div class="hud-stat">VICTORIES: <span id="victory-count">0</span></div>
+  <a id="back-btn" href="game.html">← MAIN MENU</a>
+</div>
+
+<div id="replays">
+  <div class="empty-state" id="empty-state">
+    <h2>NO BATTLES RECORDED</h2>
+    <p>Win some battles in GAME MODE to see your victories here. Defeated bosses and your team will be archived automatically.</p>
+  </div>
+</div>
+
+<script>
+const cur = document.getElementById('cur');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+});
+
+const NEONS = [
+  { hex:'#c8a84b', rgb:'200,168,75' },
+  { hex:'#00f5ff', rgb:'0,245,255' },
+  { hex:'#ff2244', rgb:'255,34,68' },
+  { hex:'#bc13fe', rgb:'188,19,254' },
+  { hex:'#39ff14', rgb:'57,255,20' },
+];
+let neonIdx = 0;
+function applyNeon(n) {
+  document.documentElement.style.setProperty('--neon', n.hex);
+  document.documentElement.style.setProperty('--neon-rgb', n.rgb);
+  document.documentElement.style.setProperty('--neon-glow', `rgba(${n.rgb},.7)`);
+  document.documentElement.style.setProperty('--neon-dim', `rgba(${n.rgb},.18)`);
+}
+function cycleNeon() {
+  neonIdx = (neonIdx + 1) % NEONS.length;
+  applyNeon(NEONS[neonIdx]);
+}
+applyNeon(NEONS[0]);
+setInterval(cycleNeon, 2500);
+
+/* ── Replay data ── */
+function loadReplays() {
+  try {
+    return JSON.parse(localStorage.getItem('nexusReplays') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveReplay(id, replay) {
+  const replays = loadReplays();
+  const idx = replays.findIndex(r => r.id === id);
+  if (idx > -1) replays.splice(idx, 1);
+  localStorage.setItem('nexusReplays', JSON.stringify(replays));
+}
+
+function renderReplays() {
+  const replays = loadReplays();
+  const container = document.getElementById('replays');
+  const empty = document.getElementById('empty-state');
+  document.getElementById('victory-count').textContent = replays.length;
+
+  if (replays.length === 0) {
+    empty.style.display = 'block';
+    container.innerHTML = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  container.innerHTML = replays.map(r => `
+    <div class="replay">
+      <div class="replay-meta">
+        <div class="replay-time">${r.timestamp}</div>
+        <div class="replay-boss">${r.boss.name}</div>
+        <div class="replay-hp">HP: ${r.boss.hp.toLocaleString()}</div>
+        <div class="replay-team">
+          ${r.team.map(h => `<img class="team-hero" src="${h.img}" onerror="this.src='https://via.placeholder.com/64/0a0a14/fff?text=${encodeURIComponent(h.name[0])}'" data-name="${h.name}" alt="${h.name}">`).join('')}
+        </div>
+      </div>
+      <button class="replay-del" onclick="deleteReplay(${r.id})">DELETE</button>
+    </div>
+  `).join('');
+}
+
+/* ── Delete ── */
+window.deleteReplay = function(id) {
+  if (confirm('Delete this victory record?')) {
+    saveReplay(id);
+    renderReplays();
+  }
+};
+
+/* ── Init ── */
+renderReplays();
+</script>
+</body>
+</html>
